@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- [DB연결 사용법] 1. SQL문 작성 하고 다음과 같은 양식으로 만들어준다. -->
+<!-- sql문 작성 -->
+<mapper namespace="postMapper">
+		<select id="postSelect" resultType="PostDTO">
+			SELECT * FROM POSTTABLE ORDER BY postId DESC
+		</select>
+		<select id="postSelect_one" resultType="PostDTO">
+			SELECT * FROM POSTTABLE WHERE postId=#{postId} ORDER BY postId DESC
+		</select>
+		
+		<insert id="postInsert" parameterType="PostDTO">
+			INSERT INTO POSTTABLE(userId,postTitle,postContents,postingDate)
+			VALUES(#{userId}, #{postTitle}, #{postContents}, #{postingDate})
+		</insert>
+		
+		
+		<update id="postUpdate" parameterType="PostDTO">
+			UPDATE POSTTABLE
+			SET postTitle=#{postTitle},postContents=#{postContents} WHERE postId=#{postId}
+		</update>
+		
+		<delete id="postDelete" parameterType="PostDTO">
+			DELETE FROM POSTTABLE
+			WHERE postId=#{postId}
+		</delete>
+		
+		<!-- 코멘트 부분  -->
+		
+		<select id="postCommentSelect" parameterType="PostCommentDTO" resultType="PostCommentDTO">
+			SELECT * FROM POSTCOMMENTTABLE WHERE postId=#{postId} ORDER BY commentId ASC
+		</select>
+		
+		<insert id="postCommentInsert" parameterType="PostCommentDTO">
+			INSERT INTO POSTCOMMENTTABLE(postId,userId,contents,commentDate)
+			VALUES(#{postId}, #{userId}, #{contents}, #{commentDate})
+		</insert>
+		
+		<delete id="postCommentDelete" parameterType="PostCommentDTO">
+			DELETE FROM POSTCOMMENTTABLE
+			WHERE commentId=#{commentId}
+		</delete>
+		
+		<update id="postCommentUpdate" parameterType="PostCommentDTO">
+			UPDATE POSTCOMMENTTABLE
+			SET contents=#{contents} WHERE commentId=#{commentId}
+		</update>
+		
+</mapper>

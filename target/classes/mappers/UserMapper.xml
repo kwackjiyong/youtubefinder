@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <!-- [DB연결 사용법] 1. SQL문 작성 하고 다음과 같은 양식으로 만들어준다.-->
+<!-- sql문 작성 -->
+<mapper namespace="userMapper">
+	<!-- 아래부터 내가만든 -->
+	<select id="userSelectAll" parameterType="UserDTO" resultType="UserDTO">
+		SELECT * FROM USERTABLE
+	</select>
+	<select id="userSelectOne" parameterType="UserDTO" resultType="UserDTO">
+		SELECT * FROM USERTABLE WHERE userId=#{userId}
+	</select>
+	<insert id="userInsert" parameterType="UserDTO">
+		INSERT INTO USERTABLE(userId,userName,userPw,userEmail,userBirth,userGender,userClass)
+		VALUES(#{userId}, #{userName}, #{userPw}, #{userEmail}, #{userBirth}, #{userGender}, #{userClass})
+	</insert>
+	<update id="userModify" parameterType="UserDTO">
+		UPDATE USERTABLE
+		SET userName=#{userName},userPw=#{userPw},userEmail=#{userEmail},userBirth=#{userBirth},userGender=#{userGender} WHERE userId=#{userId} 
+	</update>
+	
+	<update id="userModify_FavorGroup" parameterType="UserDTO">
+		UPDATE USERTABLE
+		SET favorTagGroup=#{favorTagGroup} WHERE userId=#{userId} 
+	</update>
+	
+	
+</mapper>

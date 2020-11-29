@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- [DB연결 사용법] 1. SQL문 작성 하고 다음과 같은 양식으로 만들어준다. -->
+<!-- sql문 작성 -->
+<mapper namespace="channelMapper">
+		<select id="channelSelect" resultType="ChannelDTO">
+			SELECT * FROM CHANNELTABLE ORDER BY ChannelId DESC
+		</select>
+		<select id="channelSelect_one" resultType="ChannelDTO">
+			SELECT * FROM CHANNELTABLE WHERE ChannelId=#{ChannelId}
+		</select>
+		<insert id="channelInsert" parameterType="ChannelDTO">
+			INSERT INTO CHANNELTABLE(userId,ChannelTitle,ChannelContents,ChannelingDate)
+			VALUES(#{userId}, #{ChannelTitle}, #{ChannelContents}, #{ChannelingDate})
+		</insert>
+		<update id="channelUpdate" parameterType="ChannelDTO">
+			UPDATE CHANNELTABLE
+			SET ChannelTitle=#{ChannelTitle},ChannelContents=#{ChannelContents} WHERE ChannelId=#{ChannelId}
+		</update>
+		<delete id="channelDelete" parameterType="ChannelDTO">
+			DELETE FROM CHANNELTABLE
+			WHERE ChannelId=#{ChannelId}
+		</delete>
+		
+		<!-- 좋아요 -->
+		<insert id="likeInsert" parameterType="LikeDTO">
+			INSERT INTO LIKETABLE(channelId,userId,likeWhether,likeDate)
+			VALUES(#{channelId}, #{userId}, #{likeWhether}, #{likeDate})
+		</insert>
+		<!-- 태그  -->
+		<insert id="tagInsert" parameterType="TagDTO">
+			INSERT INTO TAGTABLE(userId,channelId,tagName,taggingDate)
+			VALUES(#{userId}, #{channelId}, #{tagName}, #{taggingDate})
+		</insert>
+		<!-- 좋아요&채널 -->
+		<select id="channelSelect2" resultType="ChannelDTO">
+		SELECT ch.channelId,ch.channelName,ch.channelExp,ch.registerDate,(select count(*) from liketable where likeWhether = 1 AND channelId=ch.channelId )as likeCnt,(select count(*) from liketable where likeWhether = 0 AND channelId=ch.channelId )as dislikeCnt FROM channeltable as ch ORDER BY ch.ChannelId DESC;
+		</select>
+		<!--ㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇ 선호채널 관련 ㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇ -->
+		<!-- 좋아요 -->
+		<insert id="likeInsert_my" parameterType="LikeDTO">
+			INSERT INTO LIKETABLE(channelId,userId,likeWhether,likeDate)
+			VALUES(#{channelId}, #{userId}, #{likeWhether}, #{likeDate})
+		</insert>
+		<!-- 태그  -->
+		<insert id="tagInsert_my" parameterType="TagDTO">
+			INSERT INTO TAGTABLE(userId,channelId,tagName,taggingDate)
+			VALUES(#{userId}, #{channelId}, #{tagName}, #{taggingDate})
+		</insert>
+		<!-- 좋아요&채널 -->
+		<select id="channelSelect_my" parameterType="FavorTagDTO" resultType="ChannelDTO">
+		SELECT ch.channelId,ch.channelName,ch.channelExp,ch.registerDate
+		,(SELECT COUNT(channelId) FROM tagtable WHERE tagName in (SELECT tagName FROM favortagtable WHERE userId=#{userId} AND groupName=#{groupName}) AND channelId=ch.channelId group by channelId) as relevance
+		,(select count(*) from liketable where likeWhether = 1 AND channelId=ch.channelId )as likeCnt
+		,(select count(*) from liketable where likeWhether = 0 AND channelId=ch.channelId )as dislikeCnt 
+		FROM 
+		channeltable as ch
+		WHERE channelId in (SELECT channelId FROM tagtable WHERE tagName in (SELECT tagName FROM favortagtable WHERE userId=#{userId} AND groupName=#{groupName}) group by channelId)
+		ORDER BY relevance DESC;
+		</select>
+		
+		
+</mapper>

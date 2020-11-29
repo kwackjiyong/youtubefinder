@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- [DB연결 사용법] 1. SQL문 작성 하고 다음과 같은 양식으로 만들어준다. -->
+<!-- sql문 작성 -->
+<mapper namespace="tagMapper">
+
+	<!--  
+	<resultMap id="TagDTOMap" type="TagDTO">
+		<id property="tagName" column="tagName" />
+		<result property="tagCount" column="tagCount" />
+	</resultMap>
+	
+		<select id="tagSelectAll2" resultType="TagDTOMap">
+			SELECT tagName,COUNT(tagName) as "tagCount" FROM TAGTABLE GROUP BY tagName
+			ORDER BY tagCount DESC
+		</select>
+	-->
+	
+	<!-- 밑에꺼 완벽한 SQL임에두 불구 작동되지않음 별칭과 문제가 있는듯-->
+		<select id="tagSelectAll" resultType="TagDTO">
+			SELECT tagName,COUNT(tagName) as "tagCount" FROM TAGTABLE GROUP BY tagName
+			ORDER BY tagCount DESC
+		</select>
+
+		<select id="tagSelectWeek" parameterType="TagDTO"
+			resultType="TagDTO">
+			SELECT tagName,COUNT(tagName) as "tagCount" FROM TAGTABLE WHERE taggingDate
+			&gt; #{taggingDate} GROUP BY tagName ORDER BY tagCount DESC
+		</select>
+		
+		<!-- 굳이 분리해서 제작 -->
+		<!-- ALL -->
+		<select id="tagSelectName" resultType="TagDTO">
+			SELECT tagName FROM TAGTABLE GROUP BY tagName
+			ORDER BY COUNT(tagName) DESC
+		</select>
+		<select id="tagSelectCount" resultType="Integer">
+			SELECT COUNT(tagName) as "tagCount" FROM TAGTABLE GROUP BY tagName
+			ORDER BY tagCount DESC
+		</select>
+		<!-- Week -->
+		<select id="tagSelectWeekName" resultType="TagDTO">
+			SELECT tagName FROM TAGTABLE  WHERE taggingDate
+			&gt; #{taggingDate} GROUP BY tagName
+			ORDER BY COUNT(tagName) DESC
+		</select>
+		<select id="tagSelectWeekCount" resultType="Integer">
+			SELECT COUNT(tagName) as "tagCount" FROM TAGTABLE  WHERE taggingDate
+			&gt; #{taggingDate} GROUP BY tagName
+			ORDER BY tagCount DESC
+		</select>
+		
+		
+		<!-- 기본적인 sql문 -->
+		<select id="tagSelectMy" parameterType="TagDTO" resultType="TagDTO">
+			SELECT * FROM TAGTABLE WHERE userId = #{userId} ORDER BY tagId DESC
+		</select>
+		
+		<insert id="tagInsert" parameterType="TagDTO">
+			INSERT INTO TAGTABLE
+			VALUES(#{channelId}, #{tagName}, #{taggingDate}, #{userId})
+		</insert>
+	
+		<!--선호 태그 관련  favorTag-->
+		
+		<select id="myFavorTag_groupName_Select" parameterType="FavorTagDTO" resultType="FavorTagDTO">
+			SELECT groupName FROM FAVORTAGTABLE WHERE userId = #{userId} GROUP BY groupName
+		</select>
+		<select id="myFavorTag_all_Select" parameterType="FavorTagDTO" resultType="FavorTagDTO">
+			SELECT * FROM FAVORTAGTABLE WHERE userId = #{userId}
+		</select>
+		
+		<insert id="myFavorTag_Insert" parameterType="FavorTagDTO">
+			INSERT INTO FAVORTAGTABLE(tagName,userId,groupName)
+			VALUES(#{tagName}, #{userId}, #{groupName})
+		</insert>
+		
+		<delete id="myFavorTag_Delete" parameterType="FavorTagDTO">
+			DELETE FROM FAVORTAGTABLE
+			WHERE tagName=#{tagName} AND groupName=#{groupName} AND userId=#{userId} 
+		</delete>
+		<delete id="myFavorTag_Group_Delete" parameterType="FavorTagDTO">
+			DELETE FROM FAVORTAGTABLE
+			WHERE groupName=#{groupName} AND userId=#{userId}
+		</delete>
+</mapper>
